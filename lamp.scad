@@ -51,15 +51,31 @@ module support_ring() {
 
 module control_ring() {
   difference(){
-    circle(r=110);
+    circle(r=120);
+    circle(r=75);
   }
 }
 
-#rotate([0,0,5.7])bottom_leaf_ring();
+module link(l) {
+  difference(){
+    hull(){
+      circle(d=10);
+      translate([l,0])circle(d=10);
+    }
+    circle(d=3);
+    translate([l,0])circle(d=3);
+  }
+}
+
+rotate([0,0,5.7])color("#2d2")bottom_leaf_ring();
 rotate([0,0,12])ring(5,180)cylinder(d=16,h=10);
 translate([0,0,4])linear_extrude(10)support_ring();
-translate([0,0,6])linear_extrude(6)control_ring();
-#translate([0,0,15])rotate([0,0,5.7+24])bottom_leaf_ring();
+translate([0,0,6])animate_rz(132,66){
+  color("#d22")linear_extrude(6)control_ring();
+  color("#22d")ring(5,110)translate([0,0,-3])animate_rz(-123,-50)linear_extrude(3)link(70);
+  rotate([0,0,24])color("#22d")ring(5,110)translate([0,0,6])animate_rz(-123,-50)linear_extrude(3)link(70);
+}
+color("#4b4")translate([0,0,15])rotate([0,0,5.7+24])bottom_leaf_ring();
 translate([0,0,14])rotate([0,0,12+24])ring(5,180)cylinder(d=16,h=10);
 translate([0,0,19])linear_extrude(10)support_ring();
 #translate([0,0,50])top_leaf_ring();
