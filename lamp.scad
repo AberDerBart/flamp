@@ -1,3 +1,5 @@
+use <bartscad/bearings.scad>
+
 $fn=120;
 
 module leaf(l, width_angle=60){
@@ -22,8 +24,14 @@ module animate_rz(a_min, a_max) {
 
 module top_leaf_ring(){
   ring(5,180){
-    translate([0,0,-5])cylinder(d=10,h=10);
-    animate_rz(-30,0) rotate([-15,5,-72]) linear_extrude(3)leaf(240,60);
+    animate_rz(-28,0){
+      #rotate([-15,5,-72]) linear_extrude(3)leaf(240,60);
+      translate([0,0,-20]){
+        cylinder(d=10,h=20);
+        rotate([0,0,230])linear_extrude(3)link(100);
+      }
+    }
+
   }
 }
 
@@ -31,12 +39,12 @@ module bottom_leaf_ring(){
   ring(5,180){
     translate([0,0,-5])cylinder(d=10,h=10);
     animate_rz(-80,0)rotate([0,0,-115]){
-      linear_extrude(3)difference(){
-        union(){
-          rotate([0,0,75])leaf(180,30);
-          translate([93,0])circle(d=15);
+      linear_extrude(3){
+        rotate([0,0,75])leaf(180,30);
+        rotate([0,0,-10]){
+          link(45);
+          translate([45,0])children();
         }
-        translate([93,0])circle(d=3);
       }
     }
   }
@@ -51,8 +59,15 @@ module support_ring() {
 
 module control_ring() {
   difference(){
+    circle(r=140);
     circle(r=120);
-    circle(r=75);
+  }
+}
+
+module control_ring_top(){
+  difference(){
+    circle(r=115);
+    circle(r=95);
   }
 }
 
@@ -67,15 +82,34 @@ module link(l) {
   }
 }
 
-rotate([0,0,5.7])color("#2d2")bottom_leaf_ring();
-rotate([0,0,12])ring(5,180)cylinder(d=16,h=10);
+*#rotate([0,0,5.7])color("#2d2")bottom_leaf_ring();
 translate([0,0,4])linear_extrude(10)support_ring();
-translate([0,0,6])animate_rz(132,66){
+translate([0,0,6])animate_rz(115,90){
   color("#d22")linear_extrude(6)control_ring();
-  color("#22d")ring(5,110)translate([0,0,-3])animate_rz(-123,-50)linear_extrude(3)link(70);
-  rotate([0,0,24])color("#22d")ring(5,110)translate([0,0,6])animate_rz(-123,-50)linear_extrude(3)link(70);
+  for(a=[0,24]){
+    translate([0,0,a/3])
+    rotate([0,0,a])color("#22d")ring(5,130)translate([0,0,-3])animate_rz(-96,-80)linear_extrude(3)link(70);
+  }
 }
-color("#4b4")translate([0,0,15])rotate([0,0,5.7+24])bottom_leaf_ring();
+
+color("#4b4")translate([0,0,15])rotate([0,0,5.7+24])bottom_leaf_ring(){
+  animate_rz(0,-85.5)rotate([0,0,74])translate([0,0,3])#linear_extrude(3)link(126);
+};
+
 translate([0,0,14])rotate([0,0,12+24])ring(5,180)cylinder(d=16,h=10);
-translate([0,0,19])linear_extrude(10)support_ring();
-#translate([0,0,50])top_leaf_ring();
+
+//translate([0,0,19])linear_extrude(10)support_ring();
+translate([0,0,21])rotate([0,0,-27])animate_rz(25,0){
+  *translate([0,0,6])color("#22d")
+    ring(5,105)
+    animate_rz(-105,-29)
+    linear_extrude(3)
+    link(59);
+}
+
+translate([0,0,50])top_leaf_ring();
+
+//circle(d=149);
+
+
+translate([0,62,-20])cube([32.2,11.8,31]);
