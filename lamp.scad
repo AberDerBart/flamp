@@ -1,11 +1,12 @@
 use <bartscad/bearings.scad>
 use <bartscad/servos.scad>
 use <bartscad/linkage.scad>
+use <bartscad/poly.scad>
 
 $fn=120;
 $hide_leaves=false;
 
-H_BASE=15;
+H_BASE=12;
 H_LEAVES=4;
 H_CONTROL_RING=4;
 H_LEAF_GAP=8;
@@ -19,10 +20,12 @@ Z_LEAVES_1 = H_BASE;
 Z_SUPPORT_1 = Z_LEAVES_1 + H_LEAF_GAP;
 Z_LEAVES_2 = Z_SUPPORT_1 + H_SUPPORT_RING;
 Z_SUPPORT_2 = Z_LEAVES_2 + H_LEAF_GAP;
-Z_LEAVES_TOP = Z_SUPPORT_2 + H_SUPPORT_RING;
+Z_LEAVES_TOP = Z_SUPPORT_2 + H_SUPPORT_RING + 15;
 
 Z_CONTROL_RING=Z_SUPPORT_1 + H_SUPPORT_RING/2 - H_CONTROL_RING/2;
 Z_CONTROL_RING_BEARING_STACK=Z_CONTROL_RING-8-3-6+1.5+H_CONTROL_RING;
+
+CHAMFER_TOP_SUPPORT_RING = 10/sqrt(2);
 
 
 module leaf(l, width_angle=60){
@@ -84,6 +87,26 @@ module support_ring() {
   }
 }
 
+module top_support_ring() {
+  rotate_extrude(){
+    poly([
+      [170,0],
+      [170,H_SUPPORT_RING],
+      [190+6,H_SUPPORT_RING],
+      [190+6,H_SUPPORT_RING-2],
+      [190,0],
+      [190,0],
+    ]);
+  }
+  *difference() {
+    hull(){
+      cylinder(r=190,h=H_SUPPORT_RING);
+      cylinder(r=190+H_SUPPORT_RING-1, h=1);
+    }
+    cylinder(r=170,h=1000,center=true);
+  }
+}
+
 module control_ring() {
   color("#d22")linear_extrude(H_CONTROL_RING)difference(){
     circle(r=140);
@@ -96,7 +119,7 @@ module control_ring() {
 
 module control_ring_bearing_stack() {
   excenter(){
-    translate([0,0,-8-4-9])cylinder(d=5,h=30);
+    translate([0,0,9])scale([1,1,-1])cylinder(d=5,h=25);
     difference(){
       union(){
         cylinder(d=8,h=3);
@@ -153,11 +176,12 @@ module servo(){
 
 module structure(){ 
   color("#dd2"){
-    linear_extrude(H_BASE)hull()support_ring();
+    #linear_extrude(H_BASE)hull()support_ring();
     translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
     translate([0,0,Z_SUPPORT_1])linear_extrude(H_SUPPORT_RING)support_ring();
     translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
-    translate([0,0,H_BASE+H_LEAF_GAP*2+H_SUPPORT_RING])linear_extrude(H_SUPPORT_RING)support_ring();
+    translate([0,0,Z_SUPPORT_2]) top_support_ring();
+    //linear_extrude(H_SUPPORT_RING)support_ring();
   }
 }
 
@@ -170,7 +194,7 @@ module mechanism(){
   translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring(){
     animate_rz(0,-85.5)rotate([0,0,74])translate([0,0,3])linear_extrude(3)link(126);
   };
-  //translate([0,0,50])top_leaf_ring();
+  translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
   *servo();
 }
 
