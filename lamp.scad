@@ -4,7 +4,7 @@ use <bartscad/linkage.scad>
 use <bartscad/poly.scad>
 
 $fn=120;
-$hide_leaves=false;
+$hide_leaves=true;
 
 H_BASE=12;
 H_LEAVES=4;
@@ -49,15 +49,41 @@ module animate_rz(a_min, a_max) {
 }
 
 module top_leaf_ring(){
+  module tr_leaf(){
+    translate([2,14,8])rotate([-15,0,-72])children();
+  }
+
   ring(5,180){
     animate_rz(-28,0){
-      translate([0,0,15])if(!$hide_leaves){
-        rotate([-15,5,-72]) linear_extrude(H_LEAVES)leaf(240,60);
+      if(!$hide_leaves)tr_leaf()linear_extrude(H_LEAVES)leaf(240,60);
+      difference(){
+        union(){
+          hull(){
+            cylinder(d=10,h=20);
+            tr_leaf()scale([1,1,-1])linear_extrude(3)offset(-2)intersection(){
+              circle(r=33);
+              leaf(240,60);
+            }
+            rotate([0,0,232])linkage([0,0],[70,0],20,57,true){
+              linear_extrude(3)link($l);
+              linear_extrude(0);
+            }
+          }
+          rotate([0,0,232]){
+            linkage([0,0],[70,0],20,57,true){
+              linear_extrude(0);
+              //linear_extrude(3)link($l);
+              translate([0,0,-8]){
+                linear_extrude(3)link($l);
+                cylinder(d=10,h=11);
+              }
+            }
+          }
+        }
+        tr_leaf()linear_extrude(100)square(100, center=true);
+        cylinder(d=2.8,h=200,center=true);
       }
-      cylinder(d=10,h=20);
-      rotate([0,0,232])linear_extrude(3)link(70,18);
     }
-
   }
 }
 
