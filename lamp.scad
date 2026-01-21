@@ -4,7 +4,7 @@ use <bartscad/linkage.scad>
 use <bartscad/poly.scad>
 
 $fn=120;
-$hide_leaves=true;
+$hide_leaves=false;
 
 H_BASE=12;
 H_LEAVES=4;
@@ -20,7 +20,7 @@ Z_LEAVES_1 = H_BASE;
 Z_SUPPORT_1 = Z_LEAVES_1 + H_LEAF_GAP;
 Z_LEAVES_2 = Z_SUPPORT_1 + H_SUPPORT_RING;
 Z_SUPPORT_2 = Z_LEAVES_2 + H_LEAF_GAP;
-Z_LEAVES_TOP = Z_SUPPORT_2 + H_SUPPORT_RING + 15;
+Z_LEAVES_TOP = Z_SUPPORT_2 + H_SUPPORT_RING;
 
 Z_CONTROL_RING=Z_SUPPORT_1 + H_SUPPORT_RING/2 - H_CONTROL_RING/2;
 Z_CONTROL_RING_BEARING_STACK=Z_CONTROL_RING-8-3-6+1.5+H_CONTROL_RING;
@@ -51,31 +51,34 @@ module animate_rz(a_min, a_max) {
 module top_leaf_ring(){
   ring(5,180){
     animate_rz(-28,0){
-      if(!$hide_leaves){
-        *rotate([-15,5,-72]) linear_extrude(H_LEAVES)leaf(240,60);
+      translate([0,0,15])if(!$hide_leaves){
+        rotate([-15,5,-72]) linear_extrude(H_LEAVES)leaf(240,60);
       }
-      translate([0,0,-20]){
-        cylinder(d=10,h=20);
-        rotate([0,0,232])linear_extrude(3)link(70,18);
-      }
+      cylinder(d=10,h=20);
+      rotate([0,0,232])linear_extrude(3)link(70,18);
     }
 
   }
 }
 
-module bottom_leaf_ring(){
+module bottom_leaf_ring(additional_link_holes=[]){
   ring(5,180){
-    translate([0,0,-5])cylinder(d=10,h=10);
+    cylinder(d=10,h=H_LEAF_GAP);
     animate_rz(-80,0)rotate([0,0,-115]){
-      linear_extrude(H_LEAVES){
-        if(!$hide_leaves){
-          rotate([0,0,75])leaf(180,30);
+      translate([0,0,H_LEAF_GAP/2])linear_extrude(H_LEAVES,center=true)difference(){
+        union(){
+          if(!$hide_leaves){
+            rotate([0,0,75])leaf(180,30);
+          }
+          rotate([0,0,-10]){
+            link(L_BOTTOM_LEAF_LINKS[1]);
+          }
         }
-        rotate([0,0,-10]){
-          link(L_BOTTOM_LEAF_LINKS[1]);
+        for(x=additional_link_holes){
+          rotate([0,0,-10])translate([x,0])circle(d=3);
         }
       }
-      rotate([0,0,-10]) translate([30,0,H_LEAVES])children();
+      rotate([0,0,-10]) translate([30,0,H_LEAF_GAP/2+H_LEAVES/2])children();
     }
   }
 }
@@ -179,13 +182,13 @@ module control_mechanism(){
         rotate([0,0,a])
         color("#22d")
         ring(5,130)
-        animate_rz(-96,-80)
+        animate_rz(-96.3,-79.5)
       {
         linear_extrude(6) difference(){
           circle(d=10);
           circle(d=3);
         }
-        translate([0,0,3])linear_extrude(3) link(L_BOTTOM_LEAF_LINKS[0],-10);
+        translate([0,0,3])linear_extrude(3) link(L_BOTTOM_LEAF_LINKS[0]);
       }
     }
   }
@@ -217,8 +220,16 @@ module mechanism(){
   translate([0,0,Z_CONTROL_RING_BEARING_STACK]){
     rotate([0,0,21.2])ring(5,110)control_ring_bearing_stack();
   }
-  translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring(){
-    color("#d2d")animate_rz(0,-83)rotate([0,0,80])translate([0,0,3])linear_extrude(3)link(115);
+  translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
+    color("#d2d"){
+      difference(){
+        union(){
+          cylinder(d=10,h=6);
+          animate_rz(0,-83)rotate([0,0,80])translate([0,0,3])linear_extrude(3)link(115.5);
+        }
+        cylinder(d=3,h=100,center=true);
+      }
+    }
   };
   color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
   *servo();
