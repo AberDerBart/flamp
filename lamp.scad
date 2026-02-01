@@ -7,33 +7,12 @@ use <util.scad>
 use <top_leaves.scad>
 use <link.scad>
 use <leaf.scad>
+use <bottom_leaves.scad>
 
 include <constants.scad>
 
 $fn=360;
 $hide_leaves=false;
-
-module bottom_leaf_ring(additional_link_holes=[]){
-  ring(5,180){
-    cylinder(d=10,h=H_LEAF_GAP);
-    animate_rz(-80,0)rotate([0,0,-115]){
-      translate([0,0,H_LEAF_GAP/2])linear_extrude(H_LEAVES,center=true)difference(){
-        union(){
-          if(!$hide_leaves){
-            rotate([0,0,75])leaf(180,30);
-          }
-          rotate([0,0,-10]){
-            link(L_BOTTOM_LEAF_LINKS[1]);
-          }
-        }
-        for(x=additional_link_holes){
-          rotate([0,0,-10])translate([x,0])circle(d=3);
-        }
-      }
-      rotate([0,0,-10]) translate([30,0,H_LEAF_GAP/2+H_LEAVES/2])children();
-    }
-  }
-}
 
 module support_ring() {
   difference(){
@@ -110,11 +89,7 @@ module control_mechanism(){
         ring(5,130)
         animate_rz(-96.3,-79.5)
       {
-        linear_extrude(6) difference(){
-          circle(d=10);
-          circle(d=3);
-        }
-        translate([0,0,3])linear_extrude(3) link(L_BOTTOM_LEAF_LINKS[0]);
+        bottom_leaf_link();
       }
     }
   }
