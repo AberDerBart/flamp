@@ -8,43 +8,17 @@ use <top_leaves.scad>
 use <link.scad>
 use <leaf.scad>
 use <bottom_leaves.scad>
+use <structure.scad>
 
 include <constants.scad>
 
 $fn=360;
 $hide_leaves=false;
 
-module support_ring() {
-  difference(){
-    circle(r=190);
-    circle(r=170);
-  }
-}
-
-module top_support_ring() {
-  rotate_extrude(){
-    poly([
-      [170,0],
-      [170,H_SUPPORT_RING],
-      [190+6,H_SUPPORT_RING],
-      [190+6,H_SUPPORT_RING-2],
-      [190,0],
-      [190,0],
-    ]);
-  }
-  *difference() {
-    hull(){
-      cylinder(r=190,h=H_SUPPORT_RING);
-      cylinder(r=190+H_SUPPORT_RING-1, h=1);
-    }
-    cylinder(r=170,h=1000,center=true);
-  }
-}
-
 module control_ring() {
   color("#d22")linear_extrude(H_CONTROL_RING)difference(){
     circle(r=140);
-    circle(r=120);
+    circle(r=R_CONTROL_RING_INNER);
     for(rz=LINK_CONTROL_ANGLES){
       rotate([0,0,rz])ring(5,130)circle(d=3);
     }
@@ -105,16 +79,6 @@ module servo(){
   }
 }
 
-module structure(){ 
-  color("#dd2"){
-    linear_extrude(H_BASE)hull()support_ring();
-    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
-    translate([0,0,Z_SUPPORT_1])linear_extrude(H_SUPPORT_RING)support_ring();
-    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
-    translate([0,0,Z_SUPPORT_2]) top_support_ring();
-  }
-}
-
 module top_leaf_link(){
   color("#d2d") difference(){
     union(){
@@ -130,7 +94,7 @@ module mechanism(){
   translate([0,0,Z_LEAVES_1])rotate([0,0,5.7])bottom_leaf_ring();
   control_mechanism();
   translate([0,0,Z_CONTROL_RING_BEARING_STACK]){
-    rotate([0,0,21.2])ring(5,110)control_ring_bearing_stack();
+    rotate([0,0,27.2])ring(5,R_CONTROL_RING_INNER-9.5)control_ring_bearing_stack();
   }
   translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
     top_leaf_link();
@@ -140,13 +104,14 @@ module mechanism(){
 }
 
 
-intersection(){
-  union(){
-    structure();
-    mechanism();
-  }
-  translate([0,-1000,-1000])cube(2000);
+module lamp(){
+  structure();
+  mechanism();
 }
 
+intersection(){
+  lamp();
+  //cube(1000);
+}
 
 
