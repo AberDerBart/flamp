@@ -37,17 +37,17 @@ module top_support_ring() {
 }
 
 module leaf_ring_1_holes(){
-  rotate([0,0,12])ring(5,180)circle(d=3);
-  rotate([0,0,5.7])ring(5,180)circle(d=3);
+  rotate([0,0,12])ring(5,R_STRUCTURE)circle(d=3);
+  rotate([0,0,5.7])ring(5,R_STRUCTURE)circle(d=3);
 }
 
 module leaf_ring_2_holes(){
-  rotate([0,0,5.7+24])ring(5,180)circle(d=3);
-  rotate([0,0,24+12])ring(5,180)circle(d=3);
+  rotate([0,0,5.7+24])ring(5,R_STRUCTURE)circle(d=3);
+  rotate([0,0,24+12])ring(5,R_STRUCTURE)circle(d=3);
 }
 
 module leaf_ring_top_holes(){
-  ring(5,180)circle(d=8);
+  ring(5,R_STRUCTURE)circle(d=8);
 }
 
 module structure(){ 
@@ -56,16 +56,16 @@ module structure(){
       base_2d();
       leaf_ring_1_holes();
     }
-    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
+    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,R_STRUCTURE)cylinder(d=16,h=H_LEAF_GAP);
     translate([0,0,Z_SUPPORT_1])linear_extrude(H_SUPPORT_RING)difference(){
       support_ring();
       leaf_ring_1_holes();
       leaf_ring_2_holes();
     }
-    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,180)cylinder(d=16,h=H_LEAF_GAP);
+    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)cylinder(d=16,h=H_LEAF_GAP);
     difference(){
       translate([0,0,Z_SUPPORT_2]) top_support_ring();
-      ring(5,180)cylinder(d=8,h=200,center=true);
+      ring(5,R_STRUCTURE)cylinder(d=8,h=200,center=true);
       linear_extrude(200,center=true) leaf_ring_2_holes();
     }
   }
@@ -91,11 +91,11 @@ module drill_guide(){
     difference(){
       union(){
         pie(360/5)support_ring();
-        translate([180,0])circle(d=20);
-        square([180,10]);
+        translate([R_STRUCTURE,0])circle(d=20);
+        square([R_STRUCTURE,10]);
         rotate([0,0,360/5]){
-          translate([180,0])circle(d=20);
-          square([180,10]);
+          translate([R_STRUCTURE,0])circle(d=20);
+          square([R_STRUCTURE,10]);
         }
         circle(d=20);
       }

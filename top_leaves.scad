@@ -24,21 +24,18 @@ function tilt_angle(a) = interpolate_sin(a, TOP_LEAF_ANGLE_MIN, TOP_LEAF_ANGLE_M
 
 tilt_angle_t = tilt_angle(oscillate(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX));
 
+angle_t=oscillate(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX);
+
+echo(TOP_LEAF_OSC_ANGLE=angle_t);
+
 module rot_leaf(){
   rotate([-tilt_angle_t,0,0])children();
 }
 
-module rot_leaf_inv(a=tilt_angle_t){
-  rotate([a,0,0])children();
-}
 function rot_leaf_inv(a=tilt_angle_t) = rx(a);
 
 module tr_leaf(){
-  translate([0,0,8])rot_leaf()translate([0,0,6])children();
-}
-
-module tr_leaf_inv(a=tilt_angle_t){
-  translate([0,0,-6])rot_leaf_inv(a)translate([0,0,-8])children();
+  translate([0,0,8])rot_leaf()translate([0,0,0])children();
 }
 
 function tr_leaf_inv(a=titl_angle_t) = tz(-6)*rot_leaf_inv(a)*tz(-8);
@@ -50,128 +47,145 @@ module top_leaf_2d(){
 
 
 module top_leaf(){
-  tr_leaf()linear_extrude(H_LEAVES)top_leaf_2d();
+  tr_leaf()translate([0,0,6])linear_extrude(H_LEAVES)top_leaf_2d();
 }
 
-function norm_diff(a,c) = sqrt((a*a)-(c*c));
+//ANGLE_OFFSET_TILT_ROLLER=50;
+//OFFSET_TILT_ROLLER=sin(ANGLE_OFFSET_TILT_ROLLER/2) * 2 * R_STRUCTURE;
 
+OFFSET_TILT_ROLLER=150;
+ANGLE_OFFSET_TILT_ROLLER=2*asin(OFFSET_TILT_ROLLER/(2*R_STRUCTURE));
 
-module tilt_support_rail(){
-  linear_extrude(0.09,center=true) {
-    translate([0,-3])square([8,13]);
+function tr_tilt_roller() = rz(-90-ANGLE_OFFSET_TILT_ROLLER/2)*tx(OFFSET_TILT_ROLLER);
+
+module tilt_roller(){
+  color("#482")tr(tr_tilt_roller()){
+    difference(){
+      linear_extrude(3){
+        circle(d=10);
+        translate([0,-5])square([7,10]);
+      }
+      cylinder(d=3,h=100,center=true);
+      cylinder(r1=0,r2=4,h=4);
+    }
+    translate([4,0,0])yzx(){
+      difference(){
+        union(){
+          linear_extrude(3){
+            hull(){
+              translate([-5,0])square([10,3]);
+              translate([0,8+3.5])circle(d=7);
+            }
+          }
+          translate([0,8+3.5,3])cylinder(r1=3.5,r2=2,h=1.5);
+        }
+        translate([0,8+3.5])cylinder(d=2.8,h=10,center=true);
+      }
+    }
+    #translate([8.5,0,8+3.5])yzx()cylinder(d=7,h=3);
   }
 }
 
-module tilt_support_cutout(){
-  linear_extrude(0.1,center=true){
-    translate([-1,0])square([5,7]);
+module tilt_rail(){
+  tilt_rail_profile = [
+    [8,10],
+    [8,-3],
+    [0,-3],
+    [0,0],
+    [5,0],
+    [5,8],
+    [0,8],
+    [0,10],
+  ];
+
+  function tr_tilt_rail(a) = rx(tilt_angle(a))*rz(-a+72)*tr_tilt_roller()*tx(8.5);
+
+  tr_leaf(){
+    let (geo = [for (a=[-31:1:3]) 
+      [
+        each [for (p2d=tilt_rail_profile) 
+          d3(tr_tilt_rail(a) * [p2d.x, 0, p2d.y, 1])
+        ],
+        // add last and first pointed scaled to z=0 to attach to the leaf
+        d3(tz(6)*sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[7].x, 0, tilt_rail_profile[7].y, 1]),
+        d3(tz(6)*sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[0].x, 0, tilt_rail_profile[0].y, 1]),
+      ]
+    ]) ex(geo);
+  }
+}
+
+module leaf_hinge(){
+  module leaf_hinge_2d(){
+    difference(){
+      poly([
+        [-5,6],
+        fillet([-5,-5],5),
+        fillet([5,-5],5),
+        [5,6],
+      ]);
+      circle(d=3);
+    }
+  }
+
+  difference(){
+    union(){
+      tr_leaf(){
+        translate([-5.5,0,0])rotate([90,0,-90])linear_extrude(5){
+          leaf_hinge_2d();
+        }
+        translate([40,0,0])rotate([90,0,90])linear_extrude(5)leaf_hinge_2d();
+        translate([0,0,6])scale([1,1,-1])linear_extrude(3){
+          poly([
+            [-10.5,-5],
+            fillet([-10.5,-15],5),
+            fillet([45,-15],5),
+            [45,-5],
+          ]);
+        }
+      }
+    }
   }
 }
 
 module top_leaf_bracket(){
-  module tilt_rail(){
-    tilt_rail_profile = [
-      [8,10],
-      [8,-3],
-      [0,-3],
-      [0,0],
-      [5,0],
-      [5,8],
-      [0,8],
-      [0,10],
-    ];
-
-    function tr_tilt_rail(a) = tr_leaf_inv(tilt_angle(-28-a)) * tz(3) * rz(a-15)*t(x=150,z=6);
-
-    tr_leaf(){
-      let (geo = [for (a=[-32:1:4]) 
-        [
-          each [for (p2d=tilt_rail_profile) 
-            d3(tr_tilt_rail(a) * [p2d.x, 0, p2d.y, 1])
-          ],
-          // add last and first pointed scaled to z=0 to attach to the leaf
-          d3(sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[7].x, 0, tilt_rail_profile[7].y, 1]),
-          d3(sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[0].x, 0, tilt_rail_profile[0].y, 1]),
-        ]
-      ]) ex(geo);
-    }
-  }
-
-  module leaf_hinge(){
-    module leaf_hinge_2d(){
-      difference(){
-        poly([
-          [-5,0],
-          fillet([-5,-11],5),
-          fillet([5,-11],5),
-          [5,0],
-        ]);
-        translate([0,-6])circle(d=3);
+  difference(){
+    union(){
+      cylinder(d=10,h=8);
+      translate([-5,0,8])rotate([0,90,0])cylinder(d=10, h=44.5);
+      rotate([0,0,232+72])linkage([0,0],[70,0],20,54,true){
+        linear_extrude(3)link($l);
+        linear_extrude(0);
       }
-    }
-
-    difference(){
-      union(){
-        tr_leaf(){
-          translate([-5.5,0,0])rotate([90,0,-90])linear_extrude(5){
-            leaf_hinge_2d();
-          }
-          translate([40,0,0])rotate([90,0,90])linear_extrude(5)leaf_hinge_2d();
-          scale([1,1,-1])linear_extrude(3){
-            poly([
-              [-10.5,-5],
-              fillet([-10.5,-15],5),
-              fillet([45,-15],5),
-              [45,-5],
-            ]);
-          }
-        }
-      }
-    }
-  }
-
-  module bracket(){
-    difference(){
-      union(){
-        cylinder(d=10,h=8);
-        translate([-5,0,8])rotate([0,90,0])cylinder(d=10, h=44.5);
-        rotate([0,0,232+72])linkage([0,0],[70,0],20,54,true){
-          linear_extrude(3)link($l);
+      rotate([0,0,232+72]){
+        linkage([0,0],[70,0],20,54,true){
           linear_extrude(0);
-        }
-        rotate([0,0,232+72]){
-          linkage([0,0],[70,0],20,54,true){
-            linear_extrude(0);
-            translate([0,0,-8]){
-              linear_extrude(3)link($l);
-              cylinder(d=10,h=11);
-            }
+          translate([0,0,-8]){
+            linear_extrude(3)link($l);
+            cylinder(d=10,h=11);
           }
         }
       }
-      cylinder(d=2.8,h=100,center=true);
-      translate([0,0,8])rotate([0,90,0])cylinder(d=2.8, h=200, center=true);
     }
+    cylinder(d=2.8,h=100,center=true);
+    translate([0,0,8])rotate([0,90,0])cylinder(d=2.8, h=200, center=true);
   }
-
-  bracket();
-  leaf_hinge();
-  tilt_rail();
 }
 
 module top_leaf_assembly(){
   rotate([0,0,-72]){
-    top_leaf();
-    top_leaf_bracket();
+    animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
+      #top_leaf();
+      top_leaf_bracket();
+      leaf_hinge();
+      tilt_rail();
+    }
   }
+  tilt_roller();
 }
 
 module top_leaf_ring(){
   ring(5,180){
-    animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
-      top_leaf_assembly();
-    }
-    #rotate([0,0,-72-15-28])translate([150,0,9+7/2])rotate([0,90,0])cylinder(d=7,h=3);
+    top_leaf_assembly();
   }
 }
 
@@ -212,6 +226,5 @@ module top_leaf_template_2d(){
   }
 }
 
+top_leaf_ring();
 
-color("#c44")translate([0,0,1])top_leaf();
-top_leaf_bracket();
