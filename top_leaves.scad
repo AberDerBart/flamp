@@ -8,6 +8,7 @@ use <bartscad/ex.scad>
 use <util.scad>
 use <leaf.scad>
 use <link.scad>
+use <mounting_tab.scad>
 
 include <constants.scad>
 
@@ -15,12 +16,11 @@ $fn=360;
 
 BRACKET_OFFSET=8;
 
-TOP_LEAF_ANGLE_MIN=-28;
-TOP_LEAF_ANGLE_MAX=0;
+TOP_LEAF_ANGLE_MIN=-100;
+TOP_LEAF_ANGLE_MAX=-68;
 
 function interpolate_sin(x, tl, th, vl, vh) = x <= tl ? vl : x >= th ? vh : vl + (1 - cos((x-tl)/(th-tl)*180)) / 2 * (vh-vl);
 function tilt_angle(a) = interpolate_sin(a, TOP_LEAF_ANGLE_MIN, TOP_LEAF_ANGLE_MAX, 15, 4);
-//function tilt_angle(a) = interpolate_sin(a, -14, -14, 15, 3);
 
 tilt_angle_t = tilt_angle(oscillate(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX));
 
@@ -56,7 +56,7 @@ module top_leaf(){
 OFFSET_TILT_ROLLER=150;
 ANGLE_OFFSET_TILT_ROLLER=2*asin(OFFSET_TILT_ROLLER/(2*R_STRUCTURE));
 
-function tr_tilt_roller() = rz(-90-ANGLE_OFFSET_TILT_ROLLER/2)*tx(OFFSET_TILT_ROLLER);
+function tr_tilt_roller() = rz(-90-ANGLE_OFFSET_TILT_ROLLER/2)*tx(OFFSET_TILT_ROLLER)*tz(3);
 
 module tilt_roller(){
   color("#482")tr(tr_tilt_roller()){
@@ -95,22 +95,32 @@ module tilt_rail(){
     [5,0],
     [5,8],
     [0,8],
-    [0,10],
+    //[0,10],
   ];
 
-  function tr_tilt_rail(a) = rx(tilt_angle(a))*rz(-a+72)*tr_tilt_roller()*tx(8.5);
+  function tr_tilt_rail(a) = rx(tilt_angle(a))*rz(-a)*tr_tilt_roller()*tx(8.5);
 
   tr_leaf(){
-    let (geo = [for (a=[-31:1:3]) 
+    let (geo = [for (a=[TOP_LEAF_ANGLE_MIN-1:1:TOP_LEAF_ANGLE_MAX+1]) 
       [
         each [for (p2d=tilt_rail_profile) 
           d3(tr_tilt_rail(a) * [p2d.x, 0, p2d.y, 1])
         ],
         // add last and first pointed scaled to z=0 to attach to the leaf
-        d3(tz(6)*sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[7].x, 0, tilt_rail_profile[7].y, 1]),
+        d3(tz(6)*sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[6].x, 0, tilt_rail_profile[6].y, 1]),
         d3(tz(6)*sz(0) * tr_tilt_rail(a) * [tilt_rail_profile[0].x, 0, tilt_rail_profile[0].y, 1]),
       ]
     ]) ex(geo);
+    for(a=[TOP_LEAF_ANGLE_MIN+1,TOP_LEAF_ANGLE_MAX-1]){
+      tr(rz(-a)*tr_tilt_roller())
+        translate([8.5+3+8,0,3])
+        scale([-1,1,-1])
+        mounting_tab(7,2,3,l=5,countersink=true);
+    }
+    tr(rz(-TOP_LEAF_ANGLE_MIN-10)*tr_tilt_roller())
+      translate([8.5-3,0,3])
+      scale([01,1,-1])
+      mounting_tab(7,2,3,l=5,countersink=true);
   }
 }
 
@@ -152,11 +162,11 @@ module top_leaf_bracket(){
     union(){
       cylinder(d=10,h=8);
       translate([-5,0,8])rotate([0,90,0])cylinder(d=10, h=44.5);
-      rotate([0,0,232+72])linkage([0,0],[70,0],20,54,true){
+      rotate([0,0,-56])linkage([0,0],[70,0],20,54,true){
         linear_extrude(3)link($l);
         linear_extrude(0);
       }
-      rotate([0,0,232+72]){
+      rotate([0,0,-56]){
         linkage([0,0],[70,0],20,54,true){
           linear_extrude(0);
           translate([0,0,-8]){
@@ -172,7 +182,7 @@ module top_leaf_bracket(){
 }
 
 module top_leaf_assembly(){
-  rotate([0,0,-72]){
+  rotate([0,0,0]){
     animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
       #top_leaf();
       top_leaf_bracket();
@@ -226,5 +236,5 @@ module top_leaf_template_2d(){
   }
 }
 
-top_leaf_ring();
+top_leaf_assembly();
 
