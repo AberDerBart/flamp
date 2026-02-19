@@ -48,6 +48,7 @@ module leaf_ring_2_holes(){
 
 module leaf_ring_top_holes(){
   ring(5,R_STRUCTURE)circle(d=8);
+  rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=3);
 }
 
 module structure(){ 
@@ -65,7 +66,7 @@ module structure(){
     translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)cylinder(d=16,h=H_LEAF_GAP);
     difference(){
       translate([0,0,Z_SUPPORT_2]) top_support_ring();
-      ring(5,R_STRUCTURE)cylinder(d=8,h=200,center=true);
+      linear_extrude(200,center=true) leaf_ring_top_holes();
       linear_extrude(200,center=true) leaf_ring_2_holes();
     }
   }
