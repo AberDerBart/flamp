@@ -20,9 +20,10 @@ module top_support_ring() {
   rotate_extrude(){
     poly([
       [170,0],
-      [170,H_SUPPORT_RING],
-      [190+6,H_SUPPORT_RING],
-      [190+6,H_SUPPORT_RING-2],
+      [170,H_SUPPORT_RING+4],
+      [190+17,H_SUPPORT_RING+4],
+      [190+17,H_SUPPORT_RING],
+      [190,H_SUPPORT_RING],
       [190,0],
       [190,0],
     ]);
@@ -37,22 +38,21 @@ module top_support_ring() {
 }
 
 module leaf_ring_1_holes(){
-  rotate([0,0,12])ring(5,R_STRUCTURE)circle(d=3);
+  rotate([0,0,12])ring(5,R_STRUCTURE)circle(d=4);
   rotate([0,0,5.7])ring(5,R_STRUCTURE)circle(d=3);
 }
 
 module leaf_ring_2_holes(){
   rotate([0,0,5.7+24])ring(5,R_STRUCTURE)circle(d=3);
-  rotate([0,0,24+12])ring(5,R_STRUCTURE)circle(d=3);
+  rotate([0,0,24+12])ring(5,R_STRUCTURE)circle(d=4);
 }
 
 module leaf_ring_top_holes(){
   ring(5,R_STRUCTURE)circle(d=8);
-  rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=3);
+  rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=6);
 }
 
 module structure(){ 
-  color("#dd2"){
     linear_extrude(H_BASE)difference(){
       base_2d();
       leaf_ring_1_holes();
@@ -69,7 +69,7 @@ module structure(){
       linear_extrude(200,center=true) leaf_ring_top_holes();
       linear_extrude(200,center=true) leaf_ring_2_holes();
     }
-  }
+    color("#222")translate([0,0,Z_SUPPORT_2+10])ring(15,195)square([10,106*3/4],center=true);
 }
 
 module outline(width){
@@ -123,6 +123,7 @@ module drill_guide(){
     }
     rotate([0,0,-24-5.7])ring(5,186)rotate([0,0,-90])text("BM",size=5,valign="center",halign="center");
     rotate([0,0,-38])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
+    rotate([0,0,-36-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
   }
 }
 
