@@ -173,7 +173,7 @@ module top_leaf_bracket(){
       translate([0,0,1])rotate([0,0,-90])linear_extrude(3)link(20);
       translate([0,-20,-12]){
         cylinder(d=10,h=16);
-        rotate([0,0,-44])linear_extrude(3)link(54.5);
+        rotate([0,0,-48])linear_extrude(3)link(43.5);
       }
     }
     cylinder(d=2.8,h=100,center=true);
@@ -184,7 +184,7 @@ module top_leaf_bracket(){
 module top_leaf_assembly(){
   rotate([0,0,0]){
     animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
-      top_leaf();
+      *top_leaf();
       top_leaf_bracket();
       leaf_hinge();
       tilt_rail();
