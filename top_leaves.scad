@@ -184,7 +184,7 @@ module top_leaf_bracket(){
 module top_leaf_assembly(){
   rotate([0,0,0]){
     animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
-      *top_leaf();
+      top_leaf();
       top_leaf_bracket();
       leaf_hinge();
       tilt_rail();

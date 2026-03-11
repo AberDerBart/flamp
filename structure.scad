@@ -6,7 +6,10 @@ use <util.scad>
 $fn=360;
 
 module base_2d(){
-  circle(r=190);
+  difference(){
+    circle(r=190);
+    circle(r=95);
+  }
 }
 
 module support_ring() {
@@ -52,18 +55,33 @@ module leaf_ring_top_holes(){
   rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=6);
 }
 
+module support(){
+  linear_extrude(H_LEAF_GAP){
+    difference(){
+      circle(d=14);
+      circle(d=10);
+    }
+  }
+  translate([0,0,1.5])linear_extrude(H_LEAF_GAP-1.5){
+    difference(){
+      circle(d=14);
+      circle(d=4.2);
+    }
+  }
+}
+
 module structure(){ 
     linear_extrude(H_BASE)difference(){
       base_2d();
       leaf_ring_1_holes();
     }
-    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,R_STRUCTURE)cylinder(d=16,h=H_LEAF_GAP);
+    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,R_STRUCTURE)support();
     translate([0,0,Z_SUPPORT_1])linear_extrude(H_SUPPORT_RING)difference(){
       support_ring();
       leaf_ring_1_holes();
       leaf_ring_2_holes();
     }
-    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)cylinder(d=16,h=H_LEAF_GAP);
+    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)support();
     difference(){
       translate([0,0,Z_SUPPORT_2]) top_support_ring();
       linear_extrude(200,center=true) leaf_ring_top_holes();
@@ -80,15 +98,15 @@ module outline(width){
 }
 
 module drill_guide(){
-  module drill_guide_2d(){
-    module pie(angle){
-      difference(){
-        children();
-        rotate([0,0,angle])translate([-500,0])square(1000);
-        rotate([0,0,180])translate([-500,0])square(1000);
-      }
+  module pie(angle,start=0){
+    difference(){
+      children();
+      rotate([0,0,start+angle])translate([-500,0])square(1000);
+      rotate([0,0,start+180])translate([-500,0])square(1000);
     }
-    
+  }
+
+  module drill_guide_2d(){
     difference(){
       union(){
         pie(360/5)support_ring();
@@ -106,6 +124,21 @@ module drill_guide(){
         leaf_ring_top_holes();
       }
       circle(d=5);
+    }
+  }
+
+  linear_extrude(20){
+    difference(){
+      pie(360/5+8, start=-4)rotate([0,0,24+12])offset(3){
+        leaf_ring_1_holes();
+        leaf_ring_2_holes();
+        leaf_ring_top_holes();
+      }
+      rotate([0,0,24+12]){
+        leaf_ring_1_holes();
+        leaf_ring_2_holes();
+        leaf_ring_top_holes();
+      }
     }
   }
 
@@ -130,3 +163,5 @@ module drill_guide(){
 rotate([0,0,36])translate([0,0,60])drill_guide();
 
 structure();
+
+!support();
