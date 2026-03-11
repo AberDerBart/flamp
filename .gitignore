@@ -1,4 +1,6 @@
 rendered
+gerber
 *.swp
 *.stl
 freecad
+pcb/pcb-backups
