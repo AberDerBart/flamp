@@ -138,10 +138,11 @@ module control_drill_jig(){
       }
     }
     circle(d=5);
-    rotate([0,0,72+22.5])translate([105,0])circle(d=3);
+    rotate([0,0,72+22.5])translate([105,0])circle(d=2);
     rotate([0,0,72+12])translate([R_STRUCTURE,0])circle(d=4);
   }
 }
 
 #control_bearing_assembly();
+$fn=360;
 control_drill_jig();

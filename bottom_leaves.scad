@@ -16,7 +16,7 @@ module bottom_leaf_link(){
       circle(d=2.8);
     }
     translate([L_BOTTOM_LEAF_LINKS[0],0,h])scale([1,1,-1]){
-      linear_extrude((h+H_LINKS)/2)difference(){
+      linear_extrude(h)difference(){
         circle(d=10);
         circle(d=2.8);
       }
