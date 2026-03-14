@@ -62,7 +62,7 @@ module mechanism(){
   #translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
     top_leaf_link();
   };
-  //color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
+  color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
   servo();
 }
 
