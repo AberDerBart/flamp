@@ -60,34 +60,37 @@ module tilt_roller(){
         rotate([0,0,ANGLE_OFFSET_TILT_ROLLER])translate([0,-5])square([7,10]);
         translate([-15,-13])square([26,3]);
       }
-      circle(d=3);
     }
   }
 
   color("#482")tr(tr_tilt_roller()){
-    translate([0,0,-4]){
-      mounting_tab(10,4,3,countersink=true);
-      linear_extrude(3)mounting_profile();
-      translate([0,0,-3])linear_extrude(6)intersection(){
-        mounting_profile();
-        rotate([0,0,-ANGLE_OFFSET_TILT_ROLLER])translate([0,-R_STRUCTURE,0])circle(r=R_STRUCTURE-10);
-      }
-    }
-    translate([4,0,0])yzx(){
-      difference(){
-        union(){
-          linear_extrude(3){
-            hull(){
-              translate([-5,-4])square([10,4]);
-              translate([0,8+3.5])circle(d=7);
+    difference(){
+      union(){
+        translate([0,0,-7])linear_extrude(6)intersection(){
+          mounting_profile();
+          rotate([0,0,-ANGLE_OFFSET_TILT_ROLLER])translate([0,-R_STRUCTURE,0])circle(r=R_STRUCTURE-10);
+        }
+        hull(){
+          translate([0,0,-4]){
+            mounting_tab(10,4,3,countersink=true);
+            linear_extrude(3)mounting_profile();
+          }
+          translate([4,0,0])yzx(){
+            linear_extrude(3){
+              hull(){
+                translate([-5,-4])square([10,4]);
+                translate([0,8+3.5])circle(d=7);
+              }
             }
           }
-          translate([0,8+3.5,3])cylinder(r1=3.5,r2=2,h=1.5);
         }
-        translate([0,8+3.5])cylinder(d=2.8,h=10,center=true);
+        translate([4,0,0])yzx()translate([0,8+3.5,3])cylinder(r1=3.5,r2=2,h=1.5);
       }
+      yzx()translate([0,8+3.5])cylinder(d=2.8,h=20,center=true);
+      cylinder(d=3,h=100,center=true);
+      translate([0,0,2])cylinder(d=8,h=20);
+      cylinder(r1=1.5, r2=3.6,h=2.1);
     }
-    //#translate([8.5,0,8+3.5])yzx()cylinder(d=7,h=3);
   }
 }
 
