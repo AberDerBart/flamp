@@ -16,19 +16,10 @@ include <constants.scad>
 
 $hide_leaves=false;
 
-module control_ring() {
-  color("#d22")linear_extrude(H_CONTROL_RING)difference(){
-    circle(r=140);
-    circle(r=R_CONTROL_RING_INNER);
-    for(rz=LINK_CONTROL_ANGLES){
-      rotate([0,0,rz])ring(5,130)circle(d=3);
-    }
-  }
-}
 
 module control_mechanism(){
   translate([0,0,Z_CONTROL_RING])animate_rz(115,90){
-    control_ring_2();
+    control_ring();
     for(a=[0,24]){
       translate([0,0,H_CONTROL_RING/2])
         scale([1,1,(a==0) ? -1:1])

@@ -90,7 +90,7 @@ module bottom_leaf_template() {
   }
 }
 
-!bottom_leaf_spacer();
+bottom_leaf_spacer();
 
 translate([0,0,-H_LEAVES/2])linear_extrude(H_LEAVES)bottom_leaf_2d();
 translate([140,0,0])bottom_leaf_template();
