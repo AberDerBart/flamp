@@ -135,15 +135,12 @@ module leaf_hinge(){
   module leaf_hinge_2d(){
     difference(){
       poly([
-        fillet([1.5,6],1),
-        fillet([1.5,-1.5],1.5),
-        fillet([-1.5,-1.5],1.5),
-        fillet([-1.5,1],1),
-        fillet([-5,1],1),
+        [-5,6],
         fillet([-5,-5],5),
         fillet([5,-5],5),
         [5,6],
       ]);
+      #circle(d=3);
     }
   }
 
@@ -153,7 +150,7 @@ module leaf_hinge(){
         translate([-5.5,0,0])rotate([90,0,-90])linear_extrude(5){
           leaf_hinge_2d();
         }
-        translate([40,0,0])scale([-1,1,1])rotate([90,0,-90])linear_extrude(5)leaf_hinge_2d();
+        translate([40,0,0])rotate([90,0,90])linear_extrude(5)leaf_hinge_2d();
         translate([0,0,6])scale([1,1,-1])linear_extrude(3)difference(){
           poly([
             [-10.5,-5],
@@ -175,15 +172,7 @@ module top_leaf_bracket(){
     union(){
       translate([0,0,1])cylinder(d=10,h=7);
       translate([0,0,0.5])cylinder(r1=2.5,r2=5,h=2);
-      translate([-5,0,8])rotate([0,90,0])linear_extrude(44.5){
-        poly([
-          fillet([5,5],5),
-          fillet([-1.1,5],1),
-          fillet([-4.5,0],6),
-          fillet([-1.1,-5],1),
-          fillet([5,-5],5),
-        ]);
-      }
+      translate([-5,0,8])rotate([0,90,0])cylinder(d=10, h=44.5);
       translate([0,0,1])rotate([0,0,-90])linear_extrude(3)link(20);
       translate([0,-20,-12]){
         cylinder(d=10,h=16);
@@ -198,7 +187,7 @@ module top_leaf_bracket(){
 module top_leaf_assembly(){
   rotate([0,0,0]){
     animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
-      *top_leaf();
+      top_leaf();
       top_leaf_bracket();
       leaf_hinge();
       tilt_rail();
