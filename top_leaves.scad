@@ -145,14 +145,14 @@ module tilt_rail(){
 
 module leaf_hinge(){
   module leaf_hinge_2d(){
+    translate([-5,3])square([10,3]);
     difference(){
-      poly([
-        [-5,6],
-        fillet([-5,-5],5),
-        fillet([5,-5],5),
-        [5,6],
-      ]);
-      #circle(d=3);
+      circle(d=7);
+      circle(d=3);
+      rotate([0,0,225])square(5);
+    }
+    for(rz=[225,225+90]){
+      rotate([0,0,rz])scale([1,0.5])translate([(3+7)/4,0])circle(d=(7-3)/2);
     }
   }
 
@@ -163,15 +163,31 @@ module leaf_hinge(){
           leaf_hinge_2d();
         }
         translate([40,0,0])rotate([90,0,90])linear_extrude(5)leaf_hinge_2d();
-        translate([0,0,6])scale([1,1,-1])linear_extrude(3)difference(){
-          poly([
-            [-10.5,-5],
-            fillet([-10.5,-15],5),
-            fillet([45,-15],5),
-            [45,-5],
-          ]);
-          for (p=[[-5.5,-10],[40,-10]]){
-            translate(p)circle(d=D_TOP_LEAF_MOUNTING_SCREW);
+        difference(){
+          translate([0,0,6])scale([1,1,-1])linear_extrude(5)difference(){
+            union(){
+              poly([
+                [-10.5,-5],
+                fillet([-10.5,-15],5),
+                fillet([45,-15],5),
+                [45,-5],
+              ]);
+              poly([
+                [45, 5],
+                fillet([35,5],5),
+                fillet([35,15],5),
+                fillet([45,15],5),
+              ]);
+            }
+            for (p=[[-5.5,-10],[40,10],[40,-10]]){
+              translate(p)circle(d=D_TOP_LEAF_MOUNTING_SCREW);
+            }
+          }
+          for(p=[[-5.5,-10],[40,10],[40,-10]]){
+            translate([p.x,p.y,0]){
+              cylinder(d=3,h=3);
+              translate([0,0,2.99])cylinder(r1=1.5,r2=0.5,h=1);
+            }
           }
         }
       }
