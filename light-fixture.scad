@@ -50,7 +50,7 @@ module lf_rim_segment(){
     rotate([0,0,360/5])translate([R_LIGHT_FIXTURE,5,5])rotate([0,90,0])cylinder(d=3,h=100,center=true);
     rotate([0,0,20])translate([R_STRUCTURE,0,0]){
       translate([0,0,7.5])cylinder(r1=1,r2=4.1,h=3.1);
-      let(z=4)xzy()linear_extrude(20,center=true)poly([
+      let(z=1)xzy()linear_extrude(20,center=true)poly([
         [-23,-1],
         [-12,z],
         [10,z],
