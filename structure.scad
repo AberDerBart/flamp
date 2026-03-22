@@ -52,7 +52,8 @@ module leaf_ring_2_holes(){
 
 module leaf_ring_top_holes(){
   ring(5,R_STRUCTURE)circle(d=8);
-  rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=6);
+  rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=2);
+  rotate([0,0,ANGLE_LIGHT_FIXTURE])ring(5,R_STRUCTURE)circle(d=2);
 }
 
 module support(){
@@ -157,11 +158,11 @@ module drill_guide(){
     rotate([0,0,-24-5.7])ring(5,186)rotate([0,0,-90])text("BM",size=5,valign="center",halign="center");
     rotate([0,0,-38])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
     rotate([0,0,-36-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
+    rotate([0,0,-36+ANGLE_LIGHT_FIXTURE])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
   }
 }
 
-rotate([0,0,36])translate([0,0,60])drill_guide();
+rotate([0,0,36])translate([0,0,80])drill_guide();
 
 structure();
 
-!support();
