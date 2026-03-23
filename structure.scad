@@ -31,13 +31,6 @@ module top_support_ring() {
       [190,0],
     ]);
   }
-  *difference() {
-    hull(){
-      cylinder(r=190,h=H_SUPPORT_RING);
-      cylinder(r=190+H_SUPPORT_RING-1, h=1);
-    }
-    cylinder(r=170,h=1000,center=true);
-  }
 }
 
 module leaf_ring_1_holes(){
@@ -71,6 +64,10 @@ module support(){
   }
 }
 
+module led_strips(){
+  ring(15,195)square([10,106*3/4],center=true);
+}
+
 module structure(){ 
     linear_extrude(H_BASE)difference(){
       base_2d();
@@ -88,7 +85,7 @@ module structure(){
       linear_extrude(200,center=true) leaf_ring_top_holes();
       linear_extrude(200,center=true) leaf_ring_2_holes();
     }
-    color("#222")translate([0,0,Z_SUPPORT_2+10])ring(15,195)square([10,106*3/4],center=true);
+    color("#222")translate([0,0,Z_SUPPORT_2+10])led_strips();
 }
 
 module outline(width){
@@ -98,15 +95,15 @@ module outline(width){
   }
 }
 
-module drill_guide(){
-  module pie(angle,start=0){
-    difference(){
-      children();
-      rotate([0,0,start+angle])translate([-500,0])square(1000);
-      rotate([0,0,start+180])translate([-500,0])square(1000);
-    }
+module pie(angle,start=0){
+  difference(){
+    children();
+    rotate([0,0,start+angle])translate([-500,0])square(1000);
+    rotate([0,0,start+180])translate([-500,0])square(1000);
   }
+}
 
+module drill_guide(){
   module drill_guide_2d(){
     difference(){
       union(){
@@ -159,6 +156,14 @@ module drill_guide(){
     rotate([0,0,-38])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
     rotate([0,0,-36-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
     rotate([0,0,-36+ANGLE_LIGHT_FIXTURE])ring(5,186)rotate([0,0,-90])text("T",size=5,valign="center",halign="center");
+  }
+}
+
+module glue_guide(){
+  linear_extrude(1)pie(360/15*3,start=180) difference(){
+    circle(r=190+17);
+    circle(r=190);
+    rotate([0,0,360/15])led_strips();
   }
 }
 
