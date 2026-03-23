@@ -215,7 +215,7 @@ module top_leaf_bracket(){
 module top_leaf_assembly(){
   rotate([0,0,0]){
     animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX){
-      top_leaf();
+      *top_leaf();
       top_leaf_bracket();
       leaf_hinge();
       tilt_rail();
@@ -237,13 +237,14 @@ module top_leaf_assembly_jig(){
       poly([
         [-100,-7],
         [0,20],
-        fillet([60,20],14),
+        fillet([50,40],14),
         [60,5],
         [120,5],
         [120,100],
-        fillet([190,-80],100),
-        fillet([117,-130],10),
-        fillet([93,-120],10),
+        [150,-35],
+        [135,-90],
+        [102,-115],
+        [90,-105],
         fillet([149,-7],30),
       ]);
     }
@@ -255,7 +256,16 @@ module top_leaf_assembly_jig(){
   linear_extrude(1) restrict() difference(){
     top_leaf_2d();
     offset(0.1)projection()leaf_hinge();
+    offset(0.1)translate([40,10.8]){
+      hull(){
+        circle(d=10);
+        translate([-6,-20])circle(d=10);
+      }
+    }
     offset(0.1)projection(cut=true)translate([0,0,-5.99])tr(tr_leaf_inv())tilt_rail();
+    for(p=[[160,-42],[138,-61],[117,-117]]){
+      translate(p)circle(d=3);
+    }
   }
 }
 
@@ -285,7 +295,7 @@ module top_leaf_template_2d(){
   }
 }
 
+$fn=360;
 top_leaf_assembly();
-
 
 translate([200,0])color("#f00")animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX)tr_leaf()top_leaf_assembly_jig();
