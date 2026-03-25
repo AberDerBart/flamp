@@ -57,6 +57,7 @@ module lf_rim_segment(){
         [10,-1],
       ]);
     }
+    translate([0,0,5])rotate([0,90,15])cylinder(d=5,h=1000);
   }
 }
 
@@ -85,3 +86,4 @@ module light_fixture(){
 
 light_fixture();
 
+$fn=360;
