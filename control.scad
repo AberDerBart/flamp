@@ -105,50 +105,111 @@ module control_ring_bearing_stack() {
 }
 
 module control_frame(){
-  color("#d22")translate([0,0,H_BASE])linear_extrude(6.5){
-    tr(TR_SERVO)union(){
-      difference(){
-        union(){
-          translate([0,-5])offset(5)servo_sg90_cutout();
-          translate([17,-10])rotate([0,0,-72])link(58);
-          translate([-7,-10])rotate([0,0,-140])link(38);
+  color("#d22")translate([0,0,H_BASE])difference(){
+    union(){
+      linear_extrude(TR_PCB[2][3]-H_BASE-2)tr(TR_PCB) difference(){
+        hull()projection()pcb();
+        for(tr_hole=TR_PCB_MOUNTING_HOLES){
+          tr(tr_hole)circle(d=2.8);
         }
-        offset(0.1)servo_sg90_cutout();
-        servo_sg90_mounting_holes();
       }
-    }
-    difference(){
-      union(){
-        tr(TR_POWER_SUPPLY*TR_POWER_SUPPLY_MOUNTING_TABS[1])circle(d=15);
-        hull(){
-          translate([38,-28])circle(d=15);
-          tr(TR_POWER_SUPPLY*TR_POWER_SUPPLY_MOUNTING_TABS[0])circle(d=15);
-        }
-        hull(){
-          for(tr_hole=TR_PCB_MOUNTING_HOLES) tr(TR_PCB*tr_hole) circle(d=10);
-        }
-        for(i=BEARING_INDEXES)let(rz=360/5*i){
-          rotate([0,0,rz+ANGLE_CONTROL_RING_BEARING]){
-            difference(){
-              union(){
-                hull(){
-                  circle(d=20);
-                  translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=15);
-                }
-                hull(){
-                  translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=15);
-                  rotate([0,0,-ANGLE_CONTROL_RING_BEARING+22.5])translate([105,0])circle(d=12);
-                }
-              }
-              rotate([0,0,-ANGLE_CONTROL_RING_BEARING+22.5])translate([105,0])circle(d=3);
-              translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=7);
-              circle(d=5);
-            }
+      linear_extrude(TR_PCB[2][3]-H_BASE){
+        for(tr_hole=TR_PCB_MOUNTING_HOLES){
+          tr(TR_PCB*tr_hole)difference(){
+            circle(d=8);
+            circle(d=2.8);
           }
         }
       }
-      for(tr_hole=TR_POWER_SUPPLY_MOUNTING_TABS) tr(TR_POWER_SUPPLY*tr_hole) circle(d=2.8);
-      for(tr_hole=TR_PCB_MOUNTING_HOLES) tr(TR_PCB*tr_hole)circle(d=2.8);
+      linear_extrude(6.5){
+        difference(){
+          union(){
+            difference(){
+              hull(){
+                translate(POS_CABLE_GUIDE)circle(d=15);
+                translate([-20,60])circle(d=15);
+              }
+              translate(POS_CABLE_GUIDE)circle(d=3.2);
+            }
+            hull(){
+              translate([15,-20])circle(d=15);
+              tr(TR_POWER_SUPPLY*TR_POWER_SUPPLY_MOUNTING_TABS[1])circle(d=15);
+            }
+            hull(){
+              translate([-20,50])circle(d=15);
+              tr(TR_POWER_SUPPLY*TR_POWER_SUPPLY_MOUNTING_TABS[0])circle(d=15);
+            }
+            for(i=BEARING_INDEXES)let(rz=360/5*i){
+              rotate([0,0,rz+ANGLE_CONTROL_RING_BEARING]){
+                difference(){
+                  union(){
+                    hull(){
+                      circle(d=20);
+                      translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=15);
+                    }
+                    hull(){
+                      translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=15);
+                      rotate([0,0,-ANGLE_CONTROL_RING_BEARING+22.5])translate([105,0])circle(d=12);
+                    }
+                  }
+                  rotate([0,0,-ANGLE_CONTROL_RING_BEARING+22.5])translate([105,0])circle(d=3);
+                  translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=7);
+                }
+              }
+            }
+          }
+          for(tr_hole=TR_POWER_SUPPLY_MOUNTING_TABS) tr(TR_POWER_SUPPLY*tr_hole) circle(d=2.8);
+          for(tr_hole=TR_PCB_MOUNTING_HOLES) tr(TR_PCB*tr_hole)circle(d=2.8);
+        }
+      }
+    }
+    tr(tz(-H_BASE)*TR_SERVO*tz(-10)){
+      servo_joy_it_cutout();
+      translate([-30,-10,-42.1])cube([30,15.1,10]);
+    }
+  }
+}
+
+module cable_guide() {
+  translate([POS_CABLE_GUIDE.x, POS_CABLE_GUIDE.y,Z_CONTROL_RING_BEARING_STACK-2])rotate([0,0,134])difference(){
+    union(){
+      linear_extrude(5)poly([
+        [4,-4],
+        [-4,-4],
+        fillet([-4,4],4),
+        fillet([4,4],4),
+      ]);
+      xzy()translate([0,0,-7])linear_extrude(3){
+        difference(){
+          poly([
+            fillet([-6,32],2),
+            fillet([-6,5],2),
+            [4,5],
+            [4,0],
+            fillet([-14,0],5),
+            fillet([-14,41],5),
+            fillet([102,41],5),
+            fillet([106,48.5],5),
+            [120,48.5],
+            [120,45.5],
+            [112,45.5],
+            fillet([112,32],12),
+          ]);
+          for(x=[5,80]){
+            translate([x,31])square([5,3]);
+            translate([x,39])square([5,3]);
+          }
+        }
+      }
+      hull(){
+        translate([120,-7+4,45.5])cylinder(d=8,h=3);
+        translate([109,-7,45.5])cube(3);
+      }
+    }
+    cylinder(d=2.8,h=10);
+    translate([120,-7+4,45]){
+      cylinder(d=1.5,h=4);
+      translate([0,0,1])cylinder(r1=0.1,r2=3,h=3);
     }
   }
 }
