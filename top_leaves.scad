@@ -12,8 +12,6 @@ use <mounting_tab.scad>
 
 include <constants.scad>
 
-$fn=360;
-
 BRACKET_OFFSET=8;
 
 TOP_LEAF_ANGLE_MIN=-100;
@@ -143,55 +141,84 @@ module tilt_rail(){
   }
 }
 
-module leaf_hinge(){
+module leaf_hinge(explode=false){
   module leaf_hinge_2d(){
-    translate([-5,3])square([10,3]);
     difference(){
-      circle(d=7);
+      poly([
+        fillet([-5,6],1),
+        fillet([-9,1],1),
+        [-9,6.1],
+        [9,6.1],
+        fillet([9,1],1),
+        fillet([5,6],1),
+        fillet([5,-5],5),
+        fillet([-5,-5],5),
+      ]);
       circle(d=3);
-      rotate([0,0,225])square(5);
-    }
-    for(rz=[225,225+90]){
-      rotate([0,0,rz])scale([1,0.5])translate([(3+7)/4,0])circle(d=(7-3)/2);
     }
   }
 
-  difference(){
-    union(){
-      tr_leaf(){
-        translate([-5.5,0,0])rotate([90,0,-90])linear_extrude(5){
+  module hinge_part(){
+    tr_leaf(){
+      difference(){
+        translate([-10.5,0,0])rotate([90,0,90])linear_extrude(55.5){
           leaf_hinge_2d();
         }
-        translate([40,0,0])rotate([90,0,90])linear_extrude(5)leaf_hinge_2d();
-        difference(){
-          translate([0,0,6])scale([1,1,-1])linear_extrude(5)difference(){
-            union(){
-              poly([
-                [-10.5,-5],
-                fillet([-10.5,-15],5),
-                fillet([45,-15],5),
-                [45,-5],
-              ]);
-              poly([
-                [45, 5],
-                fillet([35,5],5),
-                fillet([35,15],5),
-                fillet([45,15],5),
-              ]);
-            }
-            for (p=[[-5.5,-10],[40,10],[40,-10]]){
-              translate(p)circle(d=D_TOP_LEAF_MOUNTING_SCREW);
-            }
-          }
-          for(p=[[-5.5,-10],[40,10],[40,-10]]){
-            translate([p.x,p.y,0]){
-              cylinder(d=3,h=3);
-              translate([0,0,2.99])cylinder(r1=1.5,r2=0.5,h=1);
-            }
-          }
+        translate([-5.5,0,0])rotate([90,0,90])cylinder(d=12,h=45.5);
+        for(pos=[[9,9.1],[45-19.5,-9.1]]){
+          translate(pos)cylinder(r=1.1,h=20,center=true);
         }
       }
     }
+  }
+
+  module leaf_part(){
+    tr_leaf(){
+      translate([0,0,1])linear_extrude(5)poly([
+        [15,12],
+        fillet([15,10.1],1),
+        fillet([8,10.1],1),
+        fillet([8,8.1],1),
+        fillet([10,8.1],1),
+        [10,9.1],
+        [15,9.1],
+      ]);
+      difference(){
+        translate([0,0,1])linear_extrude(5)poly([
+          fillet([-10.5,-15],3),
+          fillet([50,-15],3),
+          fillet([50,15],3),
+          fillet([15,15],2),
+          [15,5],
+          [45,5],
+          [45,-5],
+          [-10.5,-5],
+        ]);
+        for(pos=[
+          [-7.5,-12],
+          [47,-12],
+          [47,12],
+          [18,12],
+        ]){
+          translate(pos){
+            cylinder(d=3,h=3);
+            translate([0,0,3])cylinder(r1=1.5,r2=0.5,h=1);
+            cylinder(d=1.2,h=10);
+          }
+          translate([-10.5,0,0])rotate([90,0,90])linear_extrude(55.5){
+            offset(0.1)leaf_hinge_2d();
+          }
+        }
+        translate([44,0,0])rotate([0,90,0])cylinder(d=8,h=7);
+      }
+    }
+  }
+
+  hinge_part();
+  if(explode){
+    translate([0,0,10])leaf_part();
+  }else{
+    leaf_part();
   }
 }
 
@@ -250,7 +277,10 @@ module top_leaf_assembly_jig(){
     }
   }
   linear_extrude(4) restrict() difference(){
-    offset(2)top_leaf_2d();
+    union(){
+      offset(2)top_leaf_2d();
+      translate([-10,10])circle(r=5);
+    }
     top_leaf_2d();
   }
   linear_extrude(1) restrict() difference(){
@@ -263,7 +293,7 @@ module top_leaf_assembly_jig(){
       }
     }
     offset(0.1)projection(cut=true)translate([0,0,-5.99])tr(tr_leaf_inv())tilt_rail();
-    for(p=[[160,-42],[138,-61],[117,-117]]){
+    for(p=[[160,-42],[138,-61],[117,-117],[18,12],[47,12]]){
       translate(p)circle(d=3);
     }
   }
@@ -299,3 +329,4 @@ $fn=360;
 top_leaf_assembly();
 
 translate([200,0])color("#f00")animate_rz(TOP_LEAF_ANGLE_MIN,TOP_LEAF_ANGLE_MAX)tr_leaf()top_leaf_assembly_jig();
+
