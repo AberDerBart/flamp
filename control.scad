@@ -2,6 +2,7 @@ use <bartscad/bearings.scad>
 use <bartscad/servos.scad>
 use <bartscad/linkage.scad>
 use <bartscad/poly.scad>
+use <bartscad/origins.scad>
 
 use <BOSL/involute_gears.scad>
 
@@ -11,41 +12,58 @@ use <link.scad>
 use <util.scad>
 include <electronics.scad>
 
+ANGLE_CENTER=180;
+
 BEARING_INDEXES=[1,2,4];
 //TR_SERVO=rz(-30)*ty(67)*tz(Z_CONTROL_RING_BEARING_STACK+4+6.5);
 
-TR_POWER_SUPPLY=rz(90-120)*t(0,-33,Z_CONTROL_RING_BEARING_STACK);
-TR_PCB=rz(90-120)*t(10,26,Z_CONTROL_RING_BEARING_STACK+15)*rz(-90);
+TR_POWER_SUPPLY=rz(ANGLE_CENTER)*t(0,-30,Z_CONTROL_RING_BEARING_STACK);
+TR_PCB=rz(ANGLE_CENTER)*t(10,29,Z_CONTROL_RING_BEARING_STACK+15)*rz(-90);
 
-MM_PER_TOOTH=2.5;
+MM_PER_TOOTH=2.6;
 TEETH_SERVO=25;
 TEETH_CONTROL_RING=180;
 
-TR_SERVO=rz(-30)
+TR_SERVO=rz(ANGLE_CENTER)
   * ty(pitch_radius(MM_PER_TOOTH,TEETH_CONTROL_RING))
   * tz(Z_CONTROL_RING+H_CONTROL_RING-pitch_radius(MM_PER_TOOTH,TEETH_SERVO))
   * t(y=-H_CONTROL_RING/sqrt(2), z=H_CONTROL_RING/sqrt(2))
   * rx(-90);
 
+POS_CABLE_GUIDE=[0,67];
+
+module servo_gear(){
+  difference(){
+    union(){
+      tr(rz(4))gear(mm_per_tooth=MM_PER_TOOTH,number_of_teeth=TEETH_SERVO, thickness=4, bevelang=45);
+      translate([0,0,-9.5])cylinder(d=18.5,h=7.52);
+    }
+    translate([0,0,-10]){
+      cylinder(d=5.8,h=4.5);
+      cylinder(d=3.2,h=20);
+    }
+  }
+}
+
 module servo(){
   tr(TR_SERVO){
-    translate([0,0,-10])servo_joy_it();
-    tr(rz(4))gear(mm_per_tooth=MM_PER_TOOTH,number_of_teeth=TEETH_SERVO, thickness=4, bevelang=45);
+    *translate([0,0,-10])servo_joy_it();
+    servo_gear();
   }
 }
 
 module control_ring(){
   color("#2d2"){
-    rotate([0,0,-90-30])translate([0,0,H_CONTROL_RING])difference(){
+    rotate([0,0,-90+ANGLE_CENTER-3])translate([0,0,H_CONTROL_RING])difference(){
       linear_extrude(H_CONTROL_RING){
         difference(){
           circle(r=R_CONTROL_RING_INNER+1);
-          translate([-1000,-500])square(1000);
+          rotate([0,0,6])translate([-1000,-500])square(1000);
           rotate([0,0,180-25])translate([-1000,-500])square(1000);
           circle(r=pitch_radius(MM_PER_TOOTH, TEETH_CONTROL_RING)-H_CONTROL_RING-1);
         }
       }
-      translate([0,0,H_CONTROL_RING/2])gear(mm_per_tooth=MM_PER_TOOTH, number_of_teeth=180,thickness=7,interior=true,bevelang=45,teeth_to_hide=180-25);
+      translate([0,0,H_CONTROL_RING/2])gear(mm_per_tooth=MM_PER_TOOTH, number_of_teeth=180,thickness=7,interior=true,bevelang=45);
     }
     translate([0,0,H_CONTROL_RING])linear_extrude(H_CONTROL_RING)difference(){
       circle(r=R_CONTROL_RING_INNER+15);
@@ -104,7 +122,14 @@ module control_ring_bearing_stack() {
   }
 }
 
+module gear_support(){
+  translate([0,0,Z_CONTROL_RING+H_CONTROL_RING*2])rotate_extrude(20,start=ANGLE_CENTER+90-10){
+    translate([72,0])square([10,3]);
+  }
+}
+
 module control_frame(){
+  gear_support();
   color("#d22")translate([0,0,H_BASE])difference(){
     union(){
       linear_extrude(TR_PCB[2][3]-H_BASE-2)tr(TR_PCB) difference(){
@@ -222,7 +247,8 @@ module control_bearing_assembly(){
     }
   }
   tr(TR_POWER_SUPPLY)power_supply();
-  tr(TR_PCB)pcb();
+  *tr(TR_PCB)pcb();
+  cable_guide();
 }
 
 module control_drill_jig(){
@@ -248,3 +274,4 @@ servo();
 tr(tz(Z_CONTROL_RING)*rz(90))control_ring();
 $fn=360;
 translate([130,0])control_drill_jig();
+
