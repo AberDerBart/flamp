@@ -50,7 +50,7 @@ module mechanism(){
   control_bearing_assembly();
   translate([0,0,Z_LEAVES_1])rotate([0,0,5.7])bottom_leaf_ring();
   control_mechanism();
-  #translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
+  translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
     top_leaf_link();
   };
   color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
@@ -59,9 +59,9 @@ module mechanism(){
 
 
 module lamp(){
-  #structure();
+  structure();
   mechanism();
-  //light_fixture();
+  light_fixture();
 }
 
 $fn=72;
