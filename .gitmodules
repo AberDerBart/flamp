@@ -1,0 +1,3 @@
+[submodule "bartscad"]
+	path = bartscad
+	url = git@github.com:AberDerBart/bartscad.git

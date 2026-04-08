@@ -6,3 +6,14 @@ If you want or need another license for some reason (especially for commercial u
 # Flamp
 
 These are the design files for my flower lamp (short "Flamp"), A dimmable ceiling lamp inspired by a flower blossom with servo-actuated petals to open up or close down.
+
+## Getting started
+
+Check out this repository using the [`--recurse-submodules`](https://git-scm.com/docs/git-clone#Documentation/git-clone.txt---recurse-submodulespathspec) flag.
+
+For the mechanical design, open `lamp.scad` in OpenSCAD.
+
+
+For the PCB design, open [pcb/pcb.kicad_pro](pcb/pcb.kicad_pro) in KiCad.
+
+
