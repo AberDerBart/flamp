@@ -35,5 +35,5 @@ module power_supply(){
 }
 
 module pcb(){
-  color("#0f0")import("pcb/pcb.stl");
+  color("#0f0")import("pcb.stl");
 }
