@@ -13,8 +13,15 @@ use <top_leaves/link.scad>
 use <structure/support.scad>
 use <light_fixture/diffusor_clamp.scad>
 use <light_fixture/rim.scad>
+use <control/ring_core.scad>
+use <control/ring_bracket.scad>
+use <control/ring_rail.scad>
+use <control/frame.scad>
+use <control/cable_guide.scad>
+use <control/bearing_washer.scad>
+use <control/drive_cam.scad>
 
-//$fn=360;
+$fn=360;
 
 translate([37,10])for(i=[0:9]){
   translate([0,i*20,7.5]) rotate([270,0,0])rotate([0,0,108])bottom_leaf_bracket();
@@ -37,12 +44,10 @@ translate([295,15])for(i=[0:4]){
 }
 
 translate([401,22])for(i=[0:4]){
-  // TODO: adjust orientation for printing
   translate([0,i*35,162.5])rotate([-94.9,0,0])rotate([180,0,60.25])tr(tr_leaf_inv())tilt_rail();
 }
 
 translate([515,150])for(i=[0:4]){
-  // TODO: adjust orientation for printing
   translate([0,i*35,-33.1])rotate([0,-129.53,0])rotate([0,0,47.5])tilt_roller();
 }
 
@@ -61,3 +66,20 @@ translate([623,10])for(i=[0:9]){
 translate([640,-30])for(i=[0:4]){
   translate([0,i*50,73])rotate([180,0,70])lf_rim_segment();
 }
+
+translate([810,15])for(i=[0:2]){
+  translate([0,i*30,0])control_bearing_washer();
+}
+
+translate([815,90,-62])rotate([-90,0,0])drive_cam();
+
+translate([815,200,74.5])rotate([90,0,0])control_ring_rail();
+
+translate([760,10])for(i=[0:4]){
+  translate([0,i*70,0])control_ring_bracket(i==4);
+}
+
+translate([230,250,-4])control_ring_core();
+
+translate([450,280,-12])control_frame();
+

@@ -39,7 +39,7 @@ module control_mechanism(){
 }
 
 module mechanism(){
-  control_bearing_assembly();
+  control_frame_assembly();
   translate([0,0,Z_LEAVES_1])rotate([0,0,5.7])bottom_leaf_ring();
   control_mechanism();
   translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
