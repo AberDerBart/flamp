@@ -189,19 +189,8 @@ module control_ring(){
   }
 }
 
-module excenter(){
-  difference(){
-    union(){
-      linear_extrude(8)let($fn=6)circle(d=11.54);
-      translate([0,0,-1.5])linear_extrude(10.5)circle(d=7);
-    }
-    translate([0.8,0,8])linear_extrude(1000, center=true)circle(d=5);
-  }
-  translate([0.8,0,8])children();
-}
-
 module control_ring_bearing_stack() {
-  excenter(){
+  translate([0,0,8]){
     translate([0,0,9])scale([1,1,-1])cylinder(d=5,h=25);
     difference(){
       union(){
@@ -228,6 +217,14 @@ module control_frame(){
           tr(TR_PCB*tr_hole)difference(){
             circle(d=8);
             circle(d=2.8);
+          }
+        }
+      }
+      linear_extrude(16.5){
+        for(i=BEARING_INDEXES)let(rz=360/5*i){
+          rotate([0,0,rz+ANGLE_CONTROL_RING_BEARING])translate([R_CONTROL_RING_BEARING_MOUNT,0])difference(){
+            circle(d=12);
+            circle(d=4.8);
           }
         }
       }
@@ -263,7 +260,7 @@ module control_frame(){
                     }
                   }
                   rotate([0,0,-ANGLE_CONTROL_RING_BEARING+22.5])translate([105,0])circle(d=3);
-                  translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=7);
+                  translate([R_CONTROL_RING_BEARING_MOUNT,0])circle(d=5);
                 }
               }
             }
