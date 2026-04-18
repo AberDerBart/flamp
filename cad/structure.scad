@@ -3,6 +3,8 @@ use <bartscad/poly.scad>
 include <constants.scad>
 use <util.scad>
 
+use <structure/support.scad>
+
 $fn=360;
 
 module base_2d(){
@@ -47,21 +49,6 @@ module leaf_ring_top_holes(){
   ring(5,R_STRUCTURE)circle(d=8);
   rotate([0,0,-2*ANGLE_OFFSET_TILT_ROLLER])ring(5,R_STRUCTURE)circle(d=2);
   rotate([0,0,ANGLE_LIGHT_FIXTURE])ring(5,R_STRUCTURE)circle(d=2);
-}
-
-module support(){
-  linear_extrude(H_LEAF_GAP){
-    difference(){
-      circle(d=14);
-      circle(d=10);
-    }
-  }
-  translate([0,0,1.5])linear_extrude(H_LEAF_GAP-1.5){
-    difference(){
-      circle(d=14);
-      circle(d=4.2);
-    }
-  }
 }
 
 module led_strips(){

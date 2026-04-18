@@ -12,6 +12,9 @@ use <structure.scad>
 use <light-fixture.scad>
 use <control.scad>
 
+use <top_leaves/link.scad>
+use <bottom_leaves/link.scad>
+
 include <constants.scad>
 
 $hide_leaves=false;
@@ -35,17 +38,6 @@ module control_mechanism(){
   }
 }
 
-module top_leaf_link(){
-  color("#d2d") difference(){
-    union(){
-      cylinder(d=10,h=6);
-      animate_rz(3.7,-80.7)rotate([0,0,80])translate([0,0,3])linear_extrude(3)link(106.4);
-    }
-    cylinder(d=2.8,h=100,center=true);
-  }
-}
-  
-
 module mechanism(){
   control_bearing_assembly();
   translate([0,0,Z_LEAVES_1])rotate([0,0,5.7])bottom_leaf_ring();
@@ -53,7 +45,7 @@ module mechanism(){
   translate([0,0,Z_LEAVES_2])rotate([0,0,5.7+24])bottom_leaf_ring([30]){
     top_leaf_link();
   };
-  color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
+  //color("#2dd")translate([0,0,Z_LEAVES_TOP])top_leaf_ring();
   servo();
 }
 
@@ -61,7 +53,7 @@ module mechanism(){
 module lamp(){
   structure();
   mechanism();
-  light_fixture();
+  //light_fixture();
 }
 
 $fn=72;
