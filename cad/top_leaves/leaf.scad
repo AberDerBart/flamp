@@ -3,8 +3,12 @@ use <../leaf.scad>
 
 include <util.scad>
 
+module top_leaf_2d_raw(){
+  leaf(240,60);
+}
+
 module top_leaf_2d(){
-  rotate([0,0,-30])translate([-BRACKET_OFFSET*1.5-5,0])rotate([0,0,30])leaf(240,60);
+  rotate([0,0,-30])translate([-BRACKET_OFFSET*1.5-5,0])rotate([0,0,30])top_leaf_2d_raw();
 }
 
 module top_leaf(){

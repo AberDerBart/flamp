@@ -97,8 +97,8 @@ module top_leaf_template_2d(){
   difference(){
     intersection(){
       translate([-1/sqrt(3)*240,0]) rotate([0,0,30]) difference() {
-        top_leaf_2d();
-        offset(-20)top_leaf_2d();
+        top_leaf_2d_raw();
+        offset(-20)top_leaf_2d_raw();
       }
       puzzle();
     }
