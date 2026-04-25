@@ -21,17 +21,16 @@ module support_ring() {
   }
 }
 
-module top_support_ring() {
-  rotate_extrude(){
-    poly([
-      [170,0],
-      [170,H_SUPPORT_RING+4],
-      [190+17,H_SUPPORT_RING+4],
-      [190+17,H_SUPPORT_RING],
-      [190,H_SUPPORT_RING],
-      [190,0],
-      [190,0],
-    ]);
+
+
+module top_support_ring_2d() {
+  support_ring();
+}
+
+module top_support_ring_rim_2d(){
+  difference(){
+    circle(r=207);
+    circle(r=170);
   }
 }
 
@@ -55,23 +54,49 @@ module led_strips(){
   ring(15,195)square([10,106*3/4],center=true);
 }
 
-module structure(){ 
+module base(){
     linear_extrude(H_BASE)difference(){
       base_2d();
       leaf_ring_1_holes();
     }
-    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,R_STRUCTURE)support();
-    translate([0,0,Z_SUPPORT_1])linear_extrude(H_SUPPORT_RING)difference(){
+}
+
+module support_ring_middle() {
+    linear_extrude(H_SUPPORT_RING)difference(){
       support_ring();
       leaf_ring_1_holes();
       leaf_ring_2_holes();
     }
-    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)support();
-    difference(){
-      translate([0,0,Z_SUPPORT_2]) top_support_ring();
-      linear_extrude(200,center=true) leaf_ring_top_holes();
-      linear_extrude(200,center=true) leaf_ring_2_holes();
+}
+
+module support_ring_top() {
+    linear_extrude(H_SUPPORT_RING)difference(){
+      top_support_ring_2d();
+      leaf_ring_top_holes();
+      leaf_ring_2_holes();
     }
+}
+
+module support_ring_top_rim(){
+    linear_extrude(4)difference(){
+      top_support_ring_rim_2d();
+      leaf_ring_top_holes();
+      leaf_ring_2_holes();
+    }
+}
+
+
+module support_ring_top_assembly(){
+  support_ring_top();
+  translate([0,0,H_SUPPORT_RING])support_ring_top_rim();
+}
+
+module structure(){ 
+    base();
+    translate([0,0,Z_LEAVES_1])rotate([0,0,12])ring(5,R_STRUCTURE)support();
+    translate([0,0,Z_SUPPORT_1])support_ring_middle();
+    translate([0,0,Z_LEAVES_2])rotate([0,0,12+24])ring(5,R_STRUCTURE)support();
+    translate([0,0,Z_SUPPORT_2])support_ring_top_assembly();
     color("#222")translate([0,0,Z_SUPPORT_2+10])led_strips();
 }
 

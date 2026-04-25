@@ -17,7 +17,7 @@ module bottom_leaf_2d(additional_link_holes=[]){
   }
 }
 
-module bottom_leaf(additional_link_holes=[]){
+module bottom_leaf(additional_link_holes=[30]){
   linear_extrude(H_LEAVES,center=true)bottom_leaf_2d(additional_link_holes);
 }
 
